@@ -1,6 +1,9 @@
 ;; Notes
 ;; C-x +  (balanced windows after split)
 
+;; C-c left (undo) C-c right (redo)
+(winner-mode t)
+
 ;; when I paste with mouse, do it at click (and not at point)
 (setq mouse-yank-at-point nil)
 
@@ -22,23 +25,24 @@
 (transient-mark-mode t)
 (setq case-fold-search t)
 (blink-cursor-mode 0)
-(custom-set-variables
 
+(custom-set-variables
  '(indent-tabs-mode nil))
+
 (line-number-mode 1)
 (column-number-mode 1)
 
 ;; scrolly stuff
 ;; http://emacs-fu.blogspot.com/2009/12/scrolling.html
 (setq
-  scroll-margin 0                  
-  scroll-conservatively 100000
-  scroll-preserve-screen-position 1)
+ scroll-margin 0                  
+ scroll-conservatively 100000
+ scroll-preserve-screen-position 1)
 
-  ;; for some reason 7 at startup is too small, but changing to 7 is pretty...
-    ;;(set-default-font "Envy Code R-9")
-    ;; the following is size 7 for me...
-    ;;(set-default-font "Bitstream Vera Sans Mono-8")
+;; for some reason 7 at startup is too small, but changing to 7 is pretty...
+;;(set-default-font "Envy Code R-9")
+;; the following is size 7 for me...
+;;(set-default-font "Bitstream Vera Sans Mono-8")
 
 (set-face-font 'default "-unknown-Envy Code R-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1")
 
@@ -218,6 +222,34 @@ and choosing a simple theme."
 (add-to-list 'auto-mode-alist '("\\.xo\\'" . archive-mode))
 ;; google gadget
 (add-to-list 'auto-mode-alist '("\\.gg\\'" . archive-mode))
+
+
+;; from https://github.com/nflath/emacs-repos/blob/master/internal/python.el
+(defun python-self-insert-command ()
+  "Appends __ to the current word if it started with __."
+  (interactive)
+  (save-excursion
+    (let ((cur (point)))
+      (search-backward-regexp "[
+\t .(-]\\|^" 0 t)
+      (if (not (looking-at "^"))
+          (forward-char 1))
+      (if (looking-at "\\s\__")
+          (setq my-temp-var t)
+        (setq my-temp-var nil))))
+  (save-excursion
+    (when (> (point) 2)
+      (backward-char 2)
+      (if (looking-at "__")
+          (setq my-temp-var nil))))
+  (if my-temp-var (insert "__"))
+  (self-insert-command 1))
+(require 'python)
+(define-key	python-mode-map (kbd ".")	'python-self-insert-command)
+(define-key	python-mode-map (kbd "SPC")	'python-self-insert-command)
+(define-key	python-mode-map (kbd "(")	'python-self-insert-command)
+
+
 
 ;; python coverage
 (load-file "/home/matt/work/emacs/pycoverage/pycov2.el")
